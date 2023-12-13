@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  # PHP Service
+  php:
+    image: php:8.3-fpm
+    volumes:
+      - './src:/var/www/html'
+
+  # NGINX Service
+  nginx:
+    image: nginx:latest
+    ports:
+      - '8081:80'
+    volumes:
+      - './src:/var/www/html'
+      - './conf.d:/etc/nginx/conf.d'
+
+  # MySQL Service
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root          # Root password
+      MYSQL_DATABASE: exampledb          # Database name
+      MYSQL_USER: exampleuser            # Database user
+      MYSQL_PASSWORD: examplepass        # Database password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  # phpMyAdmin Service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: exampleuser              # Same as MYSQL_USER
+      PMA_PASSWORD: examplepass          # Same as MYSQL_PASSWORD
+    ports:
+      - '8082:80'
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
